@@ -6,10 +6,13 @@ import json
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 
+# Import the configuration
+from src.utils.config import Paths
+
 # Define paths
-MODEL_PATH = 'cnn_leaf_disease_final.h5'
-CLASS_INDICES_PATH = 'class_indices.json'
-TEST_IMAGE_PATH = 'test_image.jpg'  # Change this to your test image path
+MODEL_PATH = Paths.CNN_MODEL
+CLASS_INDICES_PATH = Paths.CLASS_INDICES
+TEST_IMAGE_PATH = 'test_image.jpg'  # This will be provided at runtime
 
 # Load class indices
 try:

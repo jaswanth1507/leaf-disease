@@ -11,25 +11,28 @@ import seaborn as sns
 import json
 from tensorflow.keras.preprocessing import image
 
+# Import the configuration
+from src.utils.config import Paths
+
 # -------------------- SETUP --------------------
 IMG_SIZE = (128, 128)
-TEST_DIR = "C:\\Users\\anilr\\Downloads\\leaf disease\\leaf disease\\dataset\\val"
+TEST_DIR = Paths.VAL_DIR
 
 # Load class indices
-with open("class_indices.json", 'r') as f:
+with open(Paths.CLASS_INDICES, 'r') as f:
     class_indices = json.load(f)
     idx_to_class = {v: k for k, v in class_indices.items()}
 
 # Model paths
-cnn_model_path = "cnn_leaf_disease_final.h5"
-vit_model_path = "vit_leaf_disease_final.h5"
-autoencoder_model_path = "classifier_dr_detection_multiclass.h5"
+cnn_model_path = Paths.CNN_MODEL
+vit_model_path = Paths.VIT_MODEL
+autoencoder_model_path = Paths.AUTOENCODER_MODEL
 
 # Load models
 cnn_model = load_model(cnn_model_path)
 vit_model = load_model(vit_model_path, custom_objects={
-    'Patches': __import__('vit_model').Patches,
-    'PatchEncoder': __import__('vit_model').PatchEncoder
+    'Patches': __import__('src.training.vit_model').Patches,
+    'PatchEncoder': __import__('src.training.vit_model').PatchEncoder
 })
 autoencoder_model = load_model(autoencoder_model_path)
 

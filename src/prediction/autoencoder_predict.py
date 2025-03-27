@@ -5,8 +5,11 @@ import numpy as np
 import cv2
 import os
 
+# Import the configuration
+from src.utils.config import Paths
+
 # Load the trained classifier model
-classifier = load_model('autoencoder_dr_detection.h5')
+classifier = load_model(Paths.AUTOENCODER_MODEL)
 
 # Define class labels and recommendations
 class_labels = {

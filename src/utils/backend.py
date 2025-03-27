@@ -8,26 +8,28 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 
+# Import the configuration
+from src.utils.config import Paths
+
+# Create necessary directories
+Paths.create_directories()
+
 from flask_cors import CORS
 app = Flask(__name__, static_folder='static')
 CORS(app)  # This enables CORS for all routes
 
 # Configure upload folder
-UPLOAD_FOLDER = 'uploads'
-RESULT_FOLDER = 'results'
+UPLOAD_FOLDER = Paths.UPLOADS_DIR
+RESULT_FOLDER = Paths.RESULTS_DIR
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 
-# Create necessary directories
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(RESULT_FOLDER, exist_ok=True)
-
 # Load the trained classifier model
 try:
-    classifier = load_model('classifier_dr_detection_multiclass.h5')
+    classifier = load_model(Paths.AUTOENCODER_MODEL)
     print("Model loaded successfully!")
 except Exception as e:
     print(f"Error loading model: {e}")

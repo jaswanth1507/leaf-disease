@@ -7,11 +7,14 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 
 # Import custom layers from vit_model.py
-from vit_model import Patches, PatchEncoder
+from src.training.vit_model import Patches, PatchEncoder
+
+# Import the configuration
+from src.utils.config import Paths
 
 # Define paths
-MODEL_PATH = 'vit_leaf_disease_final.h5'
-CLASS_INDICES_PATH = 'class_indices.json'
+MODEL_PATH = Paths.VIT_MODEL
+CLASS_INDICES_PATH = Paths.CLASS_INDICES
 TEST_IMAGE_PATH = 'test_image.jpg'  # Change this to your test image path
 
 # Load class indices

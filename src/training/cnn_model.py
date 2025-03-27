@@ -5,6 +5,9 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 import os
 
+# Import the configuration
+from src.utils.config import Paths
+
 def build_cnn_model(input_shape=(128, 128, 3), num_classes=10):
     """
     Build a CNN model for leaf disease classification
@@ -58,8 +61,8 @@ def build_cnn_model(input_shape=(128, 128, 3), num_classes=10):
 # Main execution for training
 if __name__ == "__main__":
     # Define your dataset directories
-    train_dir = 'dataset/train'
-    validation_dir = 'dataset/val'
+    train_dir = Paths.TRAIN_DIR
+    validation_dir = Paths.VAL_DIR
     
     # Hyperparameters
     image_size = (128, 128)
@@ -119,10 +122,13 @@ if __name__ == "__main__":
         metrics=['accuracy']
     )
     
+    # Save model to the correct path
+    model_save_path = Paths.CNN_MODEL
+    
     # Callbacks
     callbacks = [
         ModelCheckpoint(
-            'cnn_leaf_disease_final.h5',
+            model_save_path,
             monitor='val_accuracy',
             save_best_only=True,
             mode='max',
@@ -152,11 +158,11 @@ if __name__ == "__main__":
         callbacks=callbacks
     )
     
-    # Save class indices
+    # Save class indices to the correct path
     import json
-    with open('class_indices.json', 'w') as f:
+    with open(Paths.CLASS_INDICES, 'w') as f:
         json.dump(train_generator.class_indices, f)
-    print(f"Class indices saved to class_indices.json")
+    print(f"Class indices saved to {Paths.CLASS_INDICES}")
     
     # Plot training history
     plt.figure(figsize=(12, 5))
