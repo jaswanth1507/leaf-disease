@@ -19,6 +19,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+leaf_disease/
 
 # Virtual Environments
 .env
@@ -30,7 +31,6 @@ env.bak/
 venv.bak/
 
 # Model files and data
-*.h5
 *.hdf5
 *.pkl
 *.pth
@@ -45,8 +45,6 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Uploads and results
-uploads/*
-results/*
 !uploads/.gitkeep
 !results/.gitkeep
 
