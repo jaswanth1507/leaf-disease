@@ -270,6 +270,27 @@
                     </div>
                     
                     <button type="button" class="btn" id="predict-btn" disabled>Predict Disease</button>
+
+                    <div class="settings-section" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="checkbox" id="bypass-leaf-detection" style="margin-right: 10px;">
+                            <label for="bypass-leaf-detection">Developer Mode: Bypass Leaf Detection</label>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: #666;">
+                            Check this if you want to process any image, even if it's not detected as a leaf.
+                        </p>
+                    </div>
+
+                    <div class="settings-section" style="margin: 20px auto; max-width: 500px; padding: 15px; background: #f8f9fa; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <h4 style="margin-top: 0; color: #666;">Advanced Options</h4>
+                        <div style="display: flex; align-items: center; margin-top: 10px;">
+                            <input type="checkbox" id="bypass-validation" style="margin-right: 10px;">
+                            <label for="bypass-validation" style="margin: 0;">Bypass Leaf Validation (Debug Mode)</label>
+                        </div>
+                        <p style="font-size: 0.8rem; margin-top: 5px; color: #777; margin-bottom: 0;">
+                            Enable this option to analyze any image, even if it's not detected as a plant leaf.
+                        </p>
+                    </div>
                 </div>
             </div>
             
@@ -437,6 +458,9 @@
             resultContent.style.display = 'none';
             noDisease.style.display = 'none';
             
+            // Check if bypass validation is enabled
+            const bypassValidation = document.getElementById('bypass-validation')?.checked || false;
+            
             // Send prediction request
             fetch(`${API_BASE_URL}/api/predict`, {
                 method: 'POST',
@@ -444,12 +468,27 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    filename: uploadedFilename
+                    filename: uploadedFilename,
+                    bypass_validation: bypassValidation
                 })
             })
             .then(response => response.json())
             .then(data => {
                 loader.style.display = 'none';
+                
+                // Check if it's not a leaf image
+                if (data.error === "not_leaf") {
+                    // Show not leaf message
+                    noDisease.innerHTML = `
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+                        <h3>Not a Plant Leaf</h3>
+                        <p>The uploaded image doesn't appear to be a plant leaf (confidence: ${(100-data.confidence).toFixed(1)}%).</p>
+                        <p>Please upload a clear image of a plant leaf for disease detection.</p>
+                        ${data.debug_image ? `<div class="debug-image-container"><img src="${API_BASE_URL}${data.debug_image}" alt="Debug image" style="max-width: 100%; margin-top: 15px; border: 1px solid #ddd; border-radius: 4px;"><div class="debug-caption">Leaf validation analysis</div></div>` : ''}
+                    `;
+                    noDisease.style.display = 'block';
+                    return;
+                }
                 
                 if (data.success) {
                     const prediction = data.prediction;
@@ -457,6 +496,12 @@
                     
                     // Check if it's a healthy plant (threshold at 40%)
                     if (confidence < 40) {
+                        noDisease.innerHTML = `
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+                            <h3>Healthy Plant</h3>
+                            <p>No disease detected. Your plant appears to be healthy!</p>
+                            <p><small>Leaf detection confidence: ${prediction.leaf_confidence.toFixed(2)}%</small></p>
+                        `;
                         noDisease.style.display = 'block';
                         return;
                     }
@@ -498,7 +543,7 @@
                     // Show the results section
                     resultContent.style.display = 'block';
                 } else {
-                    alert('Error analyzing image: ' + data.error);
+                    alert('Error analyzing image: ' + data.message || data.error);
                 }
             })
             .catch(error => {
